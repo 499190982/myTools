@@ -126,7 +126,7 @@ var X = {
 			}
 			var reader = new FileReader();
 			reader.readAsDataURL(file);
-			//当文件读取成功便可以调取上传的接口，想传哪里传哪里（PS： 你们可以把你们的靓照偷偷发给我！）      
+			//当文件读取成功便可以调取上传的接口
 			reader.onload = function(e) {
 				var data = this.result.split(',');
 				var tp = (file.type == 'image/png') ? 'png' : 'jpg';
@@ -185,7 +185,7 @@ var X = {
 //								arc(x, y, 20, 0, Math.PI * 2);
 //								fill();
 //							}
-      drawCanvas()
+     				drawCanvas()
 				}
 			}
 		}
@@ -269,6 +269,177 @@ var X = {
 			input.setAttribute('disabled', 'disabled');
 		} else {
 			input.addEventListener('change', readFile, false);
+		}
+	},
+	/**
+		* @param 星星效果
+		* @param {Object} oDom 父级dom节点
+	*/
+	star : function (oDom) {
+        var no = 20,
+            left = document.body.clientWidth - 100,
+            top = 500,
+            domHtml = "";
+        for (var i = 0; i < no; i++) {
+            var l = parseInt(Math.random() * left),
+                t = parseInt(Math.random() * top),
+                w = parseInt(Math.random() * (120 - 50 + 1) + 50, 10),
+                s = parseInt(Math.random() * 3000);
+            var styles = [
+                "left:" + l + "px",
+                "top:" + t + "px",
+                "width:" + w + "px",
+                "animation: scale1 1500ms " + parseInt(Math.random() * top) + "ms infinite ease-in-out",
+                "-moz-animation: scale1 1500ms " + parseInt(Math.random() * top) + "ms infinite ease-in-out",
+                "-webkit-animation: scale1 1500ms " + parseInt(Math.random() * top) + "ms infinite ease-in-out"
+            ];
+            styles = styles.join(";");
+            domHtml += '<img style="' + styles + '" class="star" src="images/star.png"/>'
+        }
+        $(oDom).append(domHtml);
+    },
+    /**
+		* @param 星星环绕效果		
+	*/
+	starAround : function(){
+		var f = $(".role");
+		var can = document.createElement("canvas");
+		var screenWidth = f.width();
+		var style = [
+		    "width:" + screenWidth*0.9 + "",
+		    "height:" + f.height() + "px",
+		    "position:absolute",
+		    "top:0",
+		    "pointer-events: none",
+		    "left:5%"
+		];
+		can.style.cssText = style.join(";");
+		f.css('position','relative').append(can);
+		
+		var cxt = can.getContext("2d");
+		//画布宽度
+		var wid = screenWidth*0.9;
+		//画布高度
+		var hei = f.height();
+		can.width = wid;
+		can.height = hei;
+		//雪花数目
+		var Bubble = 42;
+//		画图片
+        var imgBG = new Image();
+	    imgBG.src = "images/character/louis_normal.png";
+	    imgBG.onload = function(){
+			beginAct();
+		}
+	    f.click(function(){
+	    	beginAct();
+	    })
+		//雪花坐标、半径
+		var imgs = [];
+		for(var j = 1,l=4;j<l;j++){
+			imgs[j] = new Image();
+			imgs[j].src = "./images/effect/bubble"+j+".png"
+		}
+		var arr,rxy,DrawTimer,drawOnce; //星星数组，初始位置，定时器，运动整体方向
+			
+		function beginAct(){
+			clearInterval(DrawTimer);
+			arr = [];
+			drawOnce = true;
+			rxy = {
+				x : 0,
+				y : hei
+			}
+			for (var i = 0; i < Bubble; i++) {
+				if( i % 3 == 0 ){              //3个点一排
+					rxy.x += 30;
+					rxy.y+=Math.random() * 15;
+				}
+				var oR = Math.random()* 4;
+			        oR = oR > 3 ? ( oR > 3 ? 3.4 : 3.2 ) : ( oR > 1 ? 3 : 2.8);
+			    arr.push({
+			        x: rxy.x -= Math.random() * 30,   //x轴位置 
+			        y: rxy.y += Math.random() * 2,    //y轴位置
+			        r: oR,                            //y轴速度
+			        rx : oR,                          //x轴位置
+			        z: 1-Math.random()*2>0?1:-1,      //
+			        d : true,                         //运动方向 
+			        img : i > Bubble/3 ? ( i > Bubble/3*2 ? 1 : 2 ) : 3   //图片选择 
+			    })
+//			    Math.ceil(Math.random()*3
+			}
+			DrawTimer = setInterval(DrawBubbles, 1000/60);
+		}
+		function DrawBubbles() {	
+		    cxt.clearRect(0, 0, wid, hei);
+		    for (var i = 0; i < Bubble; i++) {
+		        var p = arr[i];
+		        if( !p.d ){
+		        	cxt.moveTo(p.x, p.y);
+		        	cxt.drawImage(imgs[p.img], p.x, p.y, 20 , 20);
+		        }
+		    }
+		    cxt.drawImage(imgBG,  0, 0, imgBG.width , imgBG.height);
+            for (var i = 0; i < Bubble; i++) {
+		        var p = arr[i];
+		        if( p.d ){
+		        	cxt.moveTo(p.x, p.y);
+		        	cxt.drawImage(imgs[p.img], p.x, p.y, 20 , 20);
+		        }
+		    }
+		    if( drawOnce ) BubbleUp();
+		      else BubbleDown();
+		    cxt.closePath();
+		}
+		
+		function drawBubbles(n){
+		    for (var i = 0; i < Bubble/3; i++) {
+		        var p = arr[i+(n-1)*(Bubble/3)];
+	    		cxt.moveTo(p.x, p.y);
+		        cxt.drawImage(imgs[n], p.x, p.y, 20 , 20);
+		    }
+	    }
+		function BubbleDown() {
+		    for (var i = 0; i < Bubble; i++) {
+		        var p = arr[i];
+		        p.y += p.r;
+	        	if (p.y > hei + 500) {
+		        	checkBubble();
+		        }	
+		    }
+		}
+		function checkBubble(){
+			var c = true;
+			for (var i = 0; i < Bubble; i++) {
+		        var p = arr[i];
+		        if (p.y < hei) {
+		        	c = false;
+		        	break;
+		        }
+		    }
+			c && clearInterval(DrawTimer);
+		}
+		function BubbleUp() {
+		    for (var i = 0; i < Bubble; i++) {
+		        var p = arr[i];
+		        p.y -= p.r;
+		        if (p.y < -500) {
+		        	drawOnce = false;
+		        	for (var i = 0; i < Bubble; i++) {
+				        var p = arr[i];
+				        p.x = Math.random()*wid;
+				        p.r = Math.random()*4+4;
+				    }
+		        	break;
+		        }
+                if( p.d ){
+                	p.x += p.rx;
+                	if( p.x >= wid ) p.d = !p.d;
+                }else{
+                	p.x -= p.rx;
+                	if( p.x <= 0 ) p.d = !p.d;
+                }
+		    }
 		}
 	}
 }
