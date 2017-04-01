@@ -112,6 +112,24 @@ var X = {
 		* @param {Object} obj 信息
 	*/
 	imgCrop:function(){
+//		 dom
+//		 '<div id="event02">
+//				<div id="event02_word"></div>
+//				<div class="style03" id="event_photo">
+//					<p>1. 請先上傳照片。 2.選擇妳喜歡的圖框樣式。 3.確認樣式後，即可上傳分享FB。<br />
+//					</p>
+//
+//					<div id="photo_choice"><img src="images/photo_a_btn.jpg" width="200" height="131" alt="" style="background-color: #000000" />&nbsp;&nbsp;&nbsp;<img src="images/photo_b_btn.jpg" width="200" height="131" alt="" style="background-color: #000000" />&nbsp;&nbsp;&nbsp;<img src="images/photo_c_btn.jpg" width="200" height="131" alt="" style="background-color: #000000" /></div>
+//
+//				</div>
+//
+//				<div id="photo_view"><canvas id="photo_canvas" style="width: 640px;height: 420px;"></canvas>
+//					<!--<img name="" src="images/photo_c.jpg" width="640" height="420" alt="" style="background-color: #ccc" />--></div>
+//				<div id="photo_btn">
+//					<a><img src="images/btn_upload.png" width="152" height="56" id="Image" /><input type="file" class="upload_pic" id="upload" /></a>&nbsp;&nbsp;
+//					<a><img src="images/btn_share.png" width="292" height="56" id="Image2" /></a>
+//				</div>
+//			</div>'
 		var input = document.getElementById("upload"),
 			perPic,
 			picN = 0,
@@ -301,39 +319,59 @@ var X = {
     /**
 		* @param 星星环绕效果		
 	*/
-	starAround : function(){
-		var f = $(".role");
+	starAround : function(obj){
+//		dom
+//		<div class="characterList">
+//			<div class="box1">
+//				<div class="wrapper">
+//					<ul>
+//						<li>
+//							<a href="javascript:void(0);">
+//								<img src="images/character/louis_select.png" />
+//							</a>
+//						</li>
+//						<li>
+//							<a href="javascript:void(0);">
+//								<img src="images/character/louis_normal.png" />
+//							</a>
+//						</li>
+//						<li>
+//							<a href="javascript:void(0);">
+//								<img src="images/character/louis_select.png" />
+//							</a>
+//						</li>
+//					</ul>
+//				</div>
+//				<span></span>
+//			</div>
+//		</div>
+		var f = obj;
 		var can = document.createElement("canvas");
 		var screenWidth = f.width();
 		var style = [
-		    "width:" + screenWidth*0.9 + "",
+		    "width:" + f.width() + "",
 		    "height:" + f.height() + "px",
 		    "position:absolute",
-		    "top:0",
+		    "bottom:20px",
 		    "pointer-events: none",
-		    "left:5%"
+		    "left:0"
 		];
 		can.style.cssText = style.join(";");
 		f.css('position','relative').append(can);
 		
 		var cxt = can.getContext("2d");
 		//画布宽度
-		var wid = screenWidth*0.9;
+		var wid = f.width();
 		//画布高度
 		var hei = f.height();
 		can.width = wid;
 		can.height = hei;
 		//雪花数目
-		var Bubble = 42;
+		var Bubble = 40;
 //		画图片
         var imgBG = new Image();
-	    imgBG.src = "images/character/louis_normal.png";
-	    imgBG.onload = function(){
-			beginAct();
-		}
-	    f.click(function(){
-	    	beginAct();
-	    })
+	    imgBG.src = obj.find('img').attr('src');
+    	beginAct();
 		//雪花坐标、半径
 		var imgs = [];
 		for(var j = 1,l=4;j<l;j++){
@@ -341,6 +379,7 @@ var X = {
 			imgs[j].src = "./images/effect/bubble"+j+".png"
 		}
 		var arr,rxy,DrawTimer,drawOnce; //星星数组，初始位置，定时器，运动整体方向
+	
 			
 		function beginAct(){
 			clearInterval(DrawTimer);
@@ -371,6 +410,7 @@ var X = {
 			DrawTimer = setInterval(DrawBubbles, 1000/60);
 		}
 		function DrawBubbles() {	
+			console.log(1)
 		    cxt.clearRect(0, 0, wid, hei);
 		    for (var i = 0; i < Bubble; i++) {
 		        var p = arr[i];
@@ -440,6 +480,10 @@ var X = {
                 	if( p.x <= 0 ) p.d = !p.d;
                 }
 		    }
+		}
+//		
+		return function overAct(){
+			clearInterval(DrawTimer);
 		}
 	}
 }
